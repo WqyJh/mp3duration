@@ -163,7 +163,15 @@ func Calculate(filename string) (duration float64, err error) {
 		return 0, statsErr
 	}
 	size := stats.Size()
+	return Calculate2(f, size)
+}
 
+type Reader interface {
+	io.Reader
+	io.ReaderAt
+}
+
+func Calculate2(f Reader, size int64) (duration float64, err error) {
 	buffer := make([]byte, 100)
 	var bytesRead int
 	bytesRead, err = f.Read(buffer)
@@ -171,7 +179,7 @@ func Calculate(filename string) (duration float64, err error) {
 		return
 	}
 	if bytesRead < 100 {
-		err = errors.New("Corrupt file")
+		err = errors.New("corrupt file")
 		return
 	}
 	offset := int64(skipID3(buffer))
